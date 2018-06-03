@@ -9,6 +9,7 @@ import android.widget.TextView;
 
 import com.rekklesdroid.android.chuckyfactsjava.R;
 import com.rekklesdroid.android.chuckyfactsjava.entity.Value;
+import com.rekklesdroid.android.chuckyfactsjava.presenter.RecyclerViewItemClickListener;
 
 import java.util.List;
 import java.util.Locale;
@@ -16,9 +17,11 @@ import java.util.Locale;
 public class JokesListAdapter extends RecyclerView.Adapter<JokesListAdapter.ViewHolder> {
 
     private List<Value> dataList;
+    private RecyclerViewItemClickListener mListener;
 
-    public JokesListAdapter(List<Value> dataList) {
+    public JokesListAdapter(RecyclerViewItemClickListener listener, List<Value> dataList) {
         this.dataList = dataList;
+        this.mListener = listener;
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
@@ -44,10 +47,16 @@ public class JokesListAdapter extends RecyclerView.Adapter<JokesListAdapter.View
 
     @Override
     public void onBindViewHolder(@NonNull JokesListAdapter.ViewHolder holder, int position) {
-        Value joke = dataList.get(position);
+        final Value joke = dataList.get(position);
 
         holder.tvId.setText(String.format(Locale.US,"%d",joke.getId()));
         holder.tvJoke.setText(String.format(Locale.US,"%s",joke.getJoke()));
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mListener.onItemClickListener(joke);
+            }
+        });
     }
 
     @Override

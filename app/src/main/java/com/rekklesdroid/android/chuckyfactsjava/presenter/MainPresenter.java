@@ -1,5 +1,7 @@
 package com.rekklesdroid.android.chuckyfactsjava.presenter;
 
+import android.util.Log;
+
 import com.rekklesdroid.android.chuckyfactsjava.MainContract;
 import com.rekklesdroid.android.chuckyfactsjava.entity.Value;
 import com.rekklesdroid.android.chuckyfactsjava.interactor.MainInteractor;
@@ -24,7 +26,7 @@ public class MainPresenter implements MainContract.Presenter, MainContract.Inter
 
     @Override
     public void onListItemClicked(Value joke) {
-
+        Log.d("joke number - ", joke.getId().toString());
     }
 
     @Override

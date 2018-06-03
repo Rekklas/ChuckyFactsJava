@@ -12,11 +12,12 @@ import com.rekklesdroid.android.chuckyfactsjava.MainContract;
 import com.rekklesdroid.android.chuckyfactsjava.R;
 import com.rekklesdroid.android.chuckyfactsjava.entity.Value;
 import com.rekklesdroid.android.chuckyfactsjava.presenter.MainPresenter;
+import com.rekklesdroid.android.chuckyfactsjava.presenter.RecyclerViewItemClickListener;
 import com.rekklesdroid.android.chuckyfactsjava.view.adapter.JokesListAdapter;
 
 import java.util.List;
 
-public class MainActivity extends BaseActivity implements MainContract.View {
+public class MainActivity extends BaseActivity implements MainContract.View, RecyclerViewItemClickListener {
 
     private MainContract.Presenter mPresenter;
     private Toolbar mToolbar;
@@ -35,7 +36,7 @@ public class MainActivity extends BaseActivity implements MainContract.View {
 
         mPresenter = new MainPresenter(this);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
-        mAdapter = new JokesListAdapter(null);
+        mAdapter = new JokesListAdapter(this, null);
         mRecyclerView.setAdapter(mAdapter);
     }
 
@@ -77,5 +78,10 @@ public class MainActivity extends BaseActivity implements MainContract.View {
         mPresenter.onDestroy();
         mPresenter = null;
         super.onDestroy();
+    }
+
+    @Override
+    public void onItemClickListener(Value joke) {
+        mPresenter.onListItemClicked(joke);
     }
 }
