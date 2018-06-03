@@ -1,21 +1,29 @@
 package com.rekklesdroid.android.chuckyfactsjava.view.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.rekklesdroid.android.chuckyfactsjava.BaseApplication;
 import com.rekklesdroid.android.chuckyfactsjava.MainContract;
 import com.rekklesdroid.android.chuckyfactsjava.R;
+import com.rekklesdroid.android.chuckyfactsjava.Screens;
 import com.rekklesdroid.android.chuckyfactsjava.entity.Value;
 import com.rekklesdroid.android.chuckyfactsjava.presenter.MainPresenter;
 import com.rekklesdroid.android.chuckyfactsjava.presenter.RecyclerViewItemClickListener;
 import com.rekklesdroid.android.chuckyfactsjava.view.adapter.JokesListAdapter;
 
 import java.util.List;
+
+import ru.terrakok.cicerone.Navigator;
+import ru.terrakok.cicerone.commands.Command;
+import ru.terrakok.cicerone.commands.Forward;
 
 public class MainActivity extends BaseActivity implements MainContract.View, RecyclerViewItemClickListener {
 
@@ -44,7 +52,47 @@ public class MainActivity extends BaseActivity implements MainContract.View, Rec
     protected void onResume() {
         super.onResume();
         mPresenter.onViewCreated();
+        BaseApplication.INSTANCE.getNavigatorHolder().setNavigator(mNavigator);
     }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        BaseApplication.INSTANCE.getNavigatorHolder().removeNavigator();
+    }
+
+    @Override
+    protected void onDestroy() {
+        mPresenter.onDestroy();
+        mPresenter = null;
+        super.onDestroy();
+    }
+
+    private Navigator mNavigator = new Navigator() {
+
+        @Override
+        public void applyCommands(Command[] commands) {
+            for (Command command : commands) applyCommand(command);
+        }
+
+        private void applyCommand(Command command) {
+            if (command instanceof Forward) {
+                forward((Forward) command);
+            }
+        }
+
+        private void forward(Forward command) {
+            switch (command.getScreenKey()) {
+                case Screens.DETAIL_ACTIVITY_SCREEN:
+                    Value data = (Value) command.getTransitionData();
+                    startActivity(new Intent(MainActivity.this, DetailActivity.class)
+                            .putExtra("data", data));
+                default:
+                    Log.e("Cicerone", "Unknown screen: " + command.getScreenKey());
+                    break;
+            }
+        }
+    };
 
     @Override
     public void showLoading() {
@@ -71,13 +119,6 @@ public class MainActivity extends BaseActivity implements MainContract.View, Rec
     @Override
     public Toolbar getToolbarInstance() {
         return mToolbar;
-    }
-
-    @Override
-    protected void onDestroy() {
-        mPresenter.onDestroy();
-        mPresenter = null;
-        super.onDestroy();
     }
 
     @Override
